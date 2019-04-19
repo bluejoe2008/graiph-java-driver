@@ -41,6 +41,8 @@ import org.neo4j.driver.types.Path;
 import org.neo4j.driver.types.Point;
 import org.neo4j.driver.types.Relationship;
 import org.neo4j.driver.types.Type;
+import org.neo4j.blob.Blob;
+
 import java.util.function.Function;
 
 import static java.util.Collections.emptyList;
@@ -89,6 +91,12 @@ public abstract class ValueAdapter extends InternalMapAccessorWithDefaultValue i
     public String asString()
     {
         throw new Uncoercible( type().name(), "Java String" );
+    }
+
+    @Override
+    public Blob asBlob()
+    {
+        throw new Uncoercible( type().name(), "blob" );
     }
 
     @Override

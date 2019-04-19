@@ -20,6 +20,7 @@ package org.neo4j.driver.internal.types;
 
 import org.neo4j.driver.internal.value.InternalValue;
 import org.neo4j.driver.Value;
+import org.neo4j.blob.BlobHolder;
 
 public enum TypeConstructor
 {
@@ -65,6 +66,15 @@ public enum TypeConstructor
     LOCAL_DATE_TIME,
     DATE_TIME,
     DURATION,
+
+    //NOTE: add blob
+    BLOB {
+        @Override
+        public boolean covers(Value value) {
+            return value instanceof BlobHolder;
+        }
+    },
+
     NULL;
 
     private static TypeConstructor typeConstructorOf( Value value )

@@ -29,6 +29,13 @@
       <groupId>org.reactivestreams</groupId>
       <artifactId>reactive-streams</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.neo4j.build</groupId>
+      <artifactId>neo4j-blob-base</artifactId>
+      <version>3.5.4-SNAPSHOT</version>
+    </dependency>
+
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-handler</artifactId>
@@ -77,6 +84,11 @@
     <dependency>
       <groupId>io.projectreactor</groupId>
       <artifactId>reactor-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.12</version>
     </dependency>
   </dependencies>
 

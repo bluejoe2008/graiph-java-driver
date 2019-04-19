@@ -34,11 +34,7 @@ import org.neo4j.driver.internal.packstream.PackStream;
 import org.neo4j.driver.internal.packstream.PackType;
 import org.neo4j.driver.internal.types.TypeConstructor;
 import org.neo4j.driver.internal.util.Iterables;
-import org.neo4j.driver.internal.value.ListValue;
-import org.neo4j.driver.internal.value.MapValue;
-import org.neo4j.driver.internal.value.NodeValue;
-import org.neo4j.driver.internal.value.PathValue;
-import org.neo4j.driver.internal.value.RelationshipValue;
+import org.neo4j.driver.internal.value.*;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.exceptions.ClientException;
 import org.neo4j.driver.types.Node;
@@ -99,6 +95,11 @@ public class ValueUnpackerV1 implements ValueUnpacker
 
     private Value unpack() throws IOException
     {
+        //NOTE: blob support
+        Value blobValue = BoltClientBlobIO.readBlob(unpacker);
+        if (blobValue != null)
+            return blobValue;
+
         PackType type = unpacker.peekNextType();
         switch ( type )
         {

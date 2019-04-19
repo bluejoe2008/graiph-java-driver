@@ -44,6 +44,7 @@ import org.neo4j.driver.types.TypeSystem;
 import org.neo4j.driver.util.Experimental;
 import java.util.function.Function;
 import org.neo4j.driver.util.Immutable;
+import org.neo4j.blob.Blob;
 
 /**
  * A unit of data that adheres to the Neo4j type system.
@@ -258,6 +259,8 @@ public interface Value extends MapAccessor, MapAccessorWithDefaultValue
      * @throws Uncoercible if value types are incompatible.
      */
     long asLong();
+
+    Blob asBlob();
 
     /**
      * Returns a Java long if no precision is lost in the conversion.

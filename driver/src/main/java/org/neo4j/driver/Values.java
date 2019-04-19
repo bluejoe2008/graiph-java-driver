@@ -40,21 +40,7 @@ import org.neo4j.driver.internal.AsValue;
 import org.neo4j.driver.internal.InternalIsoDuration;
 import org.neo4j.driver.internal.InternalPoint2D;
 import org.neo4j.driver.internal.InternalPoint3D;
-import org.neo4j.driver.internal.value.BooleanValue;
-import org.neo4j.driver.internal.value.BytesValue;
-import org.neo4j.driver.internal.value.DateTimeValue;
-import org.neo4j.driver.internal.value.DateValue;
-import org.neo4j.driver.internal.value.DurationValue;
-import org.neo4j.driver.internal.value.FloatValue;
-import org.neo4j.driver.internal.value.IntegerValue;
-import org.neo4j.driver.internal.value.ListValue;
-import org.neo4j.driver.internal.value.LocalDateTimeValue;
-import org.neo4j.driver.internal.value.LocalTimeValue;
-import org.neo4j.driver.internal.value.MapValue;
-import org.neo4j.driver.internal.value.NullValue;
-import org.neo4j.driver.internal.value.PointValue;
-import org.neo4j.driver.internal.value.StringValue;
-import org.neo4j.driver.internal.value.TimeValue;
+import org.neo4j.driver.internal.value.*;
 import org.neo4j.driver.exceptions.ClientException;
 import org.neo4j.driver.types.Entity;
 import org.neo4j.driver.types.IsoDuration;
@@ -64,6 +50,8 @@ import org.neo4j.driver.types.Path;
 import org.neo4j.driver.types.Point;
 import org.neo4j.driver.types.Relationship;
 import org.neo4j.driver.types.TypeSystem;
+import org.neo4j.blob.Blob;
+
 import java.util.function.Function;
 
 import static org.neo4j.driver.internal.util.Extract.assertParameter;
@@ -93,6 +81,11 @@ public abstract class Values
     public static Value value( Object value )
     {
         if ( value == null ) { return NullValue.NULL; }
+
+        //NOTE: blob
+        if ( value instanceof Blob) {
+            return new RemoteBlobValue((Blob)value);
+        }
 
         if ( value instanceof AsValue ) { return ((AsValue) value).asValue(); }
         if ( value instanceof Boolean ) { return value( (boolean) value ); }
