@@ -20,6 +20,8 @@ package org.neo4j.driver.internal.messaging.v3;
 
 import java.util.Map;
 
+import org.neo4j.blob.BlobMessageSignature;
+import org.neo4j.driver.internal.GetBlobMessageEncoder;
 import org.neo4j.driver.internal.messaging.AbstractMessageWriter;
 import org.neo4j.driver.internal.messaging.MessageEncoder;
 import org.neo4j.driver.internal.messaging.encode.BeginMessageEncoder;
@@ -53,13 +55,15 @@ public class MessageWriterV3 extends AbstractMessageWriter
 
     private static Map<Byte,MessageEncoder> buildEncoders()
     {
-        Map<Byte,MessageEncoder> result = Iterables.newHashMapWithSize( 9 );
+        Map<Byte,MessageEncoder> result = Iterables.newHashMapWithSize( 9 + 1 );
         result.put( HelloMessage.SIGNATURE, new HelloMessageEncoder() );
         result.put( GoodbyeMessage.SIGNATURE, new GoodbyeMessageEncoder() );
 
         result.put( RunWithMetadataMessage.SIGNATURE, new RunWithMetadataMessageEncoder() );
         result.put( DiscardAllMessage.SIGNATURE, new DiscardAllMessageEncoder() );
         result.put( PullAllMessage.SIGNATURE, new PullAllMessageEncoder() );
+
+        result.put(BlobMessageSignature.SIGNATURE_GET_BLOB(), new GetBlobMessageEncoder() ); // new
 
         result.put( BeginMessage.SIGNATURE, new BeginMessageEncoder() );
         result.put( CommitMessage.SIGNATURE, new CommitMessageEncoder() );

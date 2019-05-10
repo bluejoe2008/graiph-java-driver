@@ -22,7 +22,7 @@ import org.neo4j.driver.Value;
 import org.neo4j.driver.internal.messaging.ValuePacker;
 import org.neo4j.driver.internal.packstream.PackOutput;
 import org.neo4j.driver.internal.packstream.PackStream;
-import org.neo4j.driver.internal.value.BoltClientBlobIO;
+import org.neo4j.driver.internal.util.BoltClientBlobIO;
 import org.neo4j.driver.internal.value.InternalValue;
 
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class ValuePackerV1 implements ValuePacker
             break;
 
         case BLOB:
-            BoltClientBlobIO.writeBlob(value.asBlob(), packer);
+            BoltClientBlobIO.packBlob(value.asBlob(), packer);
             break;
 
         case BYTES:

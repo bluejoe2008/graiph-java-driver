@@ -44,6 +44,7 @@ public class InboundMessageHandler extends SimpleChannelInboundHandler<ByteBuf>
     public InboundMessageHandler( MessageFormat messageFormat, Logging logging )
     {
         this.input = new ByteBufInput();
+        this.input._inboundMessageHandler = this; //TODO
         this.reader = messageFormat.newReader( input );
         this.logging = logging;
     }

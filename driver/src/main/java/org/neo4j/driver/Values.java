@@ -84,7 +84,7 @@ public abstract class Values
 
         //NOTE: blob
         if ( value instanceof Blob) {
-            return new RemoteBlobValue((Blob)value);
+            return new InternalBlobValue((Blob)value);
         }
 
         if ( value instanceof AsValue ) { return ((AsValue) value).asValue(); }

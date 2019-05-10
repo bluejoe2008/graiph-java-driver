@@ -33,6 +33,7 @@ import org.neo4j.driver.internal.packstream.PackInput;
 import org.neo4j.driver.internal.packstream.PackStream;
 import org.neo4j.driver.internal.packstream.PackType;
 import org.neo4j.driver.internal.types.TypeConstructor;
+import org.neo4j.driver.internal.util.BoltClientBlobIO;
 import org.neo4j.driver.internal.util.Iterables;
 import org.neo4j.driver.internal.value.*;
 import org.neo4j.driver.Value;
@@ -96,7 +97,7 @@ public class ValueUnpackerV1 implements ValueUnpacker
     private Value unpack() throws IOException
     {
         //NOTE: blob support
-        Value blobValue = BoltClientBlobIO.readBlob(unpacker);
+        Value blobValue = BoltClientBlobIO.unpackBlob(unpacker);
         if (blobValue != null)
             return blobValue;
 

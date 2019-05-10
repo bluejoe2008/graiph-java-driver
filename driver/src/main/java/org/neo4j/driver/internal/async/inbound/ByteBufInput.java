@@ -27,6 +27,7 @@ import static java.util.Objects.requireNonNull;
 public class ByteBufInput implements PackInput
 {
     private ByteBuf buf;
+    public InboundMessageHandler _inboundMessageHandler;
 
     public void start( ByteBuf newBuf )
     {
