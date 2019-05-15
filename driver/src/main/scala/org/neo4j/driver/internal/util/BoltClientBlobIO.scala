@@ -31,7 +31,7 @@ object BoltClientBlobIO {
 
         val remoteHandle = new String(bs, "utf-8");
 
-        val conn = in._get("in$1._inboundMessageHandler.messageDispatcher.handlers")
+        val conn = in._get("_inboundMessageHandler.messageDispatcher.handlers")
           .asInstanceOf[util.LinkedList[_]].get(0)
           .asInstanceOf[AnyRef]
           ._get("connection.delegate").asInstanceOf[Connection];

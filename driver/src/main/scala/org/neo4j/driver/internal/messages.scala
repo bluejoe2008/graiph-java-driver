@@ -34,28 +34,34 @@ class GetBlobMessageEncoder extends MessageEncoder {
   }
 }
 
-class GetBlobMessageHandler(report: CompletableFuture[Array[CompletableFuture[BlobChunk]]], exception: CompletableFuture[Throwable])
+class GetBlobMessageHandler(report: CompletableFuture[(BlobChunk, ArrayBuffer[CompletableFuture[BlobChunk]])], exception: CompletableFuture[Throwable])
   extends ResponseHandler with Logging {
-  var _chunks: Array[CompletableFuture[BlobChunk]] = null;
+  val _chunks = ArrayBuffer[CompletableFuture[BlobChunk]]();
+  var _completedIndex = -1;
 
   override def onSuccess(metadata: java.util.Map[String, Value]): Unit = {
     exception.complete(null);
   }
 
   override def onRecord(fields: Array[Value]): Unit = {
-    val chunk = new BlobChunk(fields(0).asInt(), fields(1).asByteArray(), fields(2).asInt(), fields(3).asInt());
+    val chunk = new BlobChunk(
+      fields(0).asInt(),
+      fields(1).asInt(),
+      fields(2).asInt(),
+      fields(3).asByteArray(),
+      fields(4).asBoolean(),
+      fields(5).asInt());
+
+    _completedIndex += 1;
+    if (_chunks.size < _completedIndex + 5) {
+      _chunks ++= (0 to 9).map(_ => new CompletableFuture[BlobChunk]());
+    }
+
+    _chunks(_completedIndex).complete(chunk);
 
     //first!
-    if (chunk.currentIndex == 0) {
-      val chunks = ArrayBuffer[CompletableFuture[BlobChunk]]();
-      chunks ++= (0 to chunk.total - 1).map(x => new CompletableFuture[BlobChunk]());
-      chunks(0).complete(chunk);
-
-      _chunks = chunks.toArray;
-      report.complete(_chunks);
-    }
-    else {
-      _chunks(chunk.currentIndex).complete(chunk);
+    if (chunk.chunkId == 0) {
+      report.complete(chunk, _chunks);
     }
   }
 

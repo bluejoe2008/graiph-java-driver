@@ -18,15 +18,14 @@
  */
 package org.neo4j.driver.internal.messaging.v1;
 
-import org.neo4j.driver.Value;
+import java.io.IOException;
+import java.util.Map;
+
 import org.neo4j.driver.internal.messaging.ValuePacker;
 import org.neo4j.driver.internal.packstream.PackOutput;
 import org.neo4j.driver.internal.packstream.PackStream;
-import org.neo4j.driver.internal.util.BoltClientBlobIO;
 import org.neo4j.driver.internal.value.InternalValue;
-
-import java.io.IOException;
-import java.util.Map;
+import org.neo4j.driver.Value;
 
 public class ValuePackerV1 implements ValuePacker
 {
@@ -87,10 +86,6 @@ public class ValuePackerV1 implements ValuePacker
         {
         case NULL:
             packer.packNull();
-            break;
-
-        case BLOB:
-            BoltClientBlobIO.packBlob(value.asBlob(), packer);
             break;
 
         case BYTES:

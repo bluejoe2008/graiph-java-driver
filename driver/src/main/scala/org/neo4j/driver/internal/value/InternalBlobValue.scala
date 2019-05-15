@@ -10,6 +10,8 @@ import org.neo4j.driver.internal.spi.Connection
 import org.neo4j.driver.internal.types.{TypeConstructor, TypeRepresentation}
 import org.neo4j.driver.types.Type
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * Created by bluejoe on 2019/5/3.
   */
@@ -32,7 +34,7 @@ class InternalBlobValue(val blob: Blob)
   override def toString: String = s"BoltBlobValue(blob=${blob.toString})"
 }
 
-case class BlobChunk(currentIndex: Int, bytes: Array[Byte], length: Int, total: Int) {
+case class BlobChunk(chunkId: Int, offset: Int, length: Int, bytes: Array[Byte], eof: Boolean, totalBytes: Int) {
 }
 
 class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val mimeType: MimeType)
@@ -49,12 +51,11 @@ class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val m
         }
         else {
           val error = new CompletableFuture[Throwable]();
-          val report = new CompletableFuture[Array[CompletableFuture[BlobChunk]]]();
+          val report = new CompletableFuture[(BlobChunk, ArrayBuffer[CompletableFuture[BlobChunk]])]();
           val handler = new GetBlobMessageHandler(report, error);
-          //conn.cloneConnection().writeAndFlush(new GetBlobMessage(remoteHandle), handler);
           conn.writeAndFlush(new GetBlobMessage(remoteHandle), handler);
-          val chunkFutures = report.get();
-          new BlobInputStream(chunkFutures, error);
+          val (firstChunk, chunkFutures) = report.get();
+          new BlobInputStream(firstChunk, chunkFutures, error);
         }
 
       consume(is);
@@ -62,11 +63,10 @@ class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val m
   }
 }
 
-class BlobInputStream(chunkFutures: Array[CompletableFuture[BlobChunk]], error: CompletableFuture[Throwable]) extends InputStream with Logging {
+class BlobInputStream(firstChunk:BlobChunk, chunkFutures: ArrayBuffer[CompletableFuture[BlobChunk]], error: CompletableFuture[Throwable]) extends InputStream with Logging {
   //maybe blob is validated
   checkErrors();
 
-  val firstChunk = chunkFutures(0).get();
   var currentChunk: BlobChunk = firstChunk;
   var currentChunkInputStream = new ByteArrayInputStream(firstChunk.bytes);
 
@@ -79,7 +79,7 @@ class BlobInputStream(chunkFutures: Array[CompletableFuture[BlobChunk]], error: 
     //this chunk is consumed
     else {
       //end of file
-      if (currentChunk.currentIndex == currentChunk.total - 1) {
+      if (currentChunk.eof) {
         -1;
       }
       else {
@@ -97,7 +97,7 @@ class BlobInputStream(chunkFutures: Array[CompletableFuture[BlobChunk]], error: 
 
   @throws[IOException]
   private def readNextChunk() = {
-    val in = currentChunk.currentIndex;
+    val in = currentChunk.chunkId;
     //TODO: discard
     currentChunk = chunkFutures(in + 1).get();
     checkErrors();
