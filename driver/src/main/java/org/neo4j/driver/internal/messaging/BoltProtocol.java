@@ -20,15 +20,7 @@ package org.neo4j.driver.internal.messaging;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPromise;
-
-import java.util.Map;
-import java.util.concurrent.CompletionStage;
-
-import org.neo4j.driver.Session;
-import org.neo4j.driver.Statement;
-import org.neo4j.driver.Transaction;
-import org.neo4j.driver.TransactionConfig;
-import org.neo4j.driver.Value;
+import org.neo4j.driver.*;
 import org.neo4j.driver.exceptions.ClientException;
 import org.neo4j.driver.internal.Bookmarks;
 import org.neo4j.driver.internal.BookmarksHolder;
@@ -38,12 +30,15 @@ import org.neo4j.driver.internal.messaging.v1.BoltProtocolV1;
 import org.neo4j.driver.internal.messaging.v2.BoltProtocolV2;
 import org.neo4j.driver.internal.messaging.v3.BoltProtocolV3;
 import org.neo4j.driver.internal.messaging.v4.BoltProtocolV4;
+import org.neo4j.driver.internal.messaging.v5.BoltProtocolV5;
 import org.neo4j.driver.internal.spi.Connection;
+
+import java.util.Map;
+import java.util.concurrent.CompletionStage;
 
 import static org.neo4j.driver.internal.async.connection.ChannelAttributes.protocolVersion;
 
-public interface BoltProtocol
-{
+public interface BoltProtocol {
     /**
      * Instantiate {@link MessageFormat} used by this Bolt protocol verison.
      *
@@ -54,27 +49,28 @@ public interface BoltProtocol
     /**
      * Initialize channel after it is connected and handshake selected this protocol version.
      *
-     * @param userAgent the user agent string.
-     * @param authToken the authentication token.
+     * @param userAgent                 the user agent string.
+     * @param authToken                 the authentication token.
      * @param channelInitializedPromise the promise to be notified when initialization is completed.
      */
-    void initializeChannel( String userAgent, Map<String,Value> authToken, ChannelPromise channelInitializedPromise );
+    void initializeChannel(String userAgent, Map<String, Value> authToken, ChannelPromise channelInitializedPromise);
 
     /**
      * Prepare to close channel before it is closed.
+     *
      * @param channel the channel to close.
      */
-    void prepareToCloseChannel( Channel channel );
+    void prepareToCloseChannel(Channel channel);
 
     /**
      * Begin an explicit transaction.
      *
      * @param connection the connection to use.
-     * @param bookmarks the bookmarks. Never null, should be {@link Bookmarks#empty()} when absent.
-     * @param config the transaction configuration. Never null, should be {@link TransactionConfig#empty()} when absent.
+     * @param bookmarks  the bookmarks. Never null, should be {@link Bookmarks#empty()} when absent.
+     * @param config     the transaction configuration. Never null, should be {@link TransactionConfig#empty()} when absent.
      * @return a completion stage completed when transaction is started or completed exceptionally when there was a failure.
      */
-    CompletionStage<Void> beginTransaction( Connection connection, Bookmarks bookmarks, TransactionConfig config );
+    CompletionStage<Void> beginTransaction(Connection connection, Bookmarks bookmarks, TransactionConfig config);
 
     /**
      * Commit the explicit transaction.
@@ -82,7 +78,7 @@ public interface BoltProtocol
      * @param connection the connection to use.
      * @return a completion stage completed with a bookmark when transaction is committed or completed exceptionally when there was a failure.
      */
-    CompletionStage<Bookmarks> commitTransaction( Connection connection );
+    CompletionStage<Bookmarks> commitTransaction(Connection connection);
 
     /**
      * Rollback the explicit transaction.
@@ -90,39 +86,40 @@ public interface BoltProtocol
      * @param connection the connection to use.
      * @return a completion stage completed when transaction is rolled back or completed exceptionally when there was a failure.
      */
-    CompletionStage<Void> rollbackTransaction( Connection connection );
+    CompletionStage<Void> rollbackTransaction(Connection connection);
 
     /**
      * Execute the given statement in an aut-commit transaction, i.e. {@link Session#run(Statement)}.
      *
-     * @param connection the network connection to use.
-     * @param statement the cypher to execute.
-     * @param bookmarksHolder the bookmarksHolder that keeps track of the current bookmark and can be updated with a new bookmark.
-     * @param config the transaction config for the implicitly started auto-commit transaction.
+     * @param connection         the network connection to use.
+     * @param statement          the cypher to execute.
+     * @param bookmarksHolder    the bookmarksHolder that keeps track of the current bookmark and can be updated with a new bookmark.
+     * @param config             the transaction config for the implicitly started auto-commit transaction.
      * @param waitForRunResponse {@code true} for async query execution and {@code false} for blocking query
-     * execution. Makes returned cursor stage be chained after the RUN response arrives. Needed to have statement
-     * keys populated.
+     *                           execution. Makes returned cursor stage be chained after the RUN response arrives. Needed to have statement
+     *                           keys populated.
      * @return stage with cursor.
      */
-    StatementResultCursorFactory runInAutoCommitTransaction( Connection connection, Statement statement,
-            BookmarksHolder bookmarksHolder, TransactionConfig config, boolean waitForRunResponse );
+    StatementResultCursorFactory runInAutoCommitTransaction(Connection connection, Statement statement,
+                                                            BookmarksHolder bookmarksHolder, TransactionConfig config, boolean waitForRunResponse);
 
     /**
      * Execute the given statement in a running explicit transaction, i.e. {@link Transaction#run(Statement)}.
      *
-     * @param connection the network connection to use.
-     * @param statement the cypher to execute.
-     * @param tx the transaction which executes the query.
+     * @param connection         the network connection to use.
+     * @param statement          the cypher to execute.
+     * @param tx                 the transaction which executes the query.
      * @param waitForRunResponse {@code true} for async query execution and {@code false} for blocking query
-     * execution. Makes returned cursor stage be chained after the RUN response arrives. Needed to have statement
-     * keys populated.
+     *                           execution. Makes returned cursor stage be chained after the RUN response arrives. Needed to have statement
+     *                           keys populated.
      * @return stage with cursor.
      */
-    StatementResultCursorFactory runInExplicitTransaction( Connection connection, Statement statement, ExplicitTransaction tx,
-            boolean waitForRunResponse );
+    StatementResultCursorFactory runInExplicitTransaction(Connection connection, Statement statement, ExplicitTransaction tx,
+                                                          boolean waitForRunResponse);
 
     /**
      * Returns the protocol version. It can be used for version specific error messages.
+     *
      * @return the protocol version.
      */
     int version();
@@ -134,9 +131,8 @@ public interface BoltProtocol
      * @return the protocol.
      * @throws ClientException when unable to find protocol version for the given channel.
      */
-    static BoltProtocol forChannel( Channel channel )
-    {
-        return forVersion( protocolVersion( channel ) );
+    static BoltProtocol forChannel(Channel channel) {
+        return forVersion(protocolVersion(channel));
     }
 
     /**
@@ -146,20 +142,20 @@ public interface BoltProtocol
      * @return the protocol.
      * @throws ClientException when unable to find protocol with the given version.
      */
-    static BoltProtocol forVersion( int version )
-    {
-        switch ( version )
-        {
-        case BoltProtocolV1.VERSION:
-            return BoltProtocolV1.INSTANCE;
-        case BoltProtocolV2.VERSION:
-            return BoltProtocolV2.INSTANCE;
-        case BoltProtocolV3.VERSION:
-            return BoltProtocolV3.INSTANCE;
-        case BoltProtocolV4.VERSION:
-            return BoltProtocolV4.INSTANCE;
-        default:
-            throw new ClientException( "Unknown protocol version: " + version );
+    static BoltProtocol forVersion(int version) {
+        switch (version) {
+            case BoltProtocolV1.VERSION:
+                return BoltProtocolV1.INSTANCE;
+            case BoltProtocolV2.VERSION:
+                return BoltProtocolV2.INSTANCE;
+            case BoltProtocolV3.VERSION:
+                return BoltProtocolV3.INSTANCE;
+            case BoltProtocolV4.VERSION:
+                return BoltProtocolV4.INSTANCE;
+            case BoltProtocolV5.VERSION:
+                return BoltProtocolV5.INSTANCE;
+            default:
+                throw new ClientException("Unknown protocol version: " + version);
         }
     }
 }

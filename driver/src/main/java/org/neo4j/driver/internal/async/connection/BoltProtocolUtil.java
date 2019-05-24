@@ -44,7 +44,7 @@ public final class BoltProtocolUtil
     private static final ByteBuf HANDSHAKE_BUF = unreleasableBuffer( copyInt(
             BOLT_MAGIC_PREAMBLE,
             BoltProtocolV5.VERSION,
-            BoltProtocolV4.VERSION,
+            //BoltProtocolV4.VERSION,
             BoltProtocolV3.VERSION,
             BoltProtocolV2.VERSION,
             BoltProtocolV1.VERSION ) ).asReadOnly();

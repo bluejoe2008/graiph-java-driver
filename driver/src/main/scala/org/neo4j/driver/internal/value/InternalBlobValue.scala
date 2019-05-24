@@ -4,7 +4,6 @@ import java.io.{ByteArrayInputStream, IOException, InputStream}
 import java.util.concurrent.CompletableFuture
 
 import org.neo4j.blob._
-import org.neo4j.blob.utils.Logging
 import org.neo4j.driver.internal._
 import org.neo4j.driver.internal.spi.Connection
 import org.neo4j.driver.internal.types.{TypeConstructor, TypeRepresentation}
@@ -15,8 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by bluejoe on 2019/5/3.
   */
-class InternalBlobValue(val blob: Blob)
-  extends ValueAdapter with BlobHolder {
+class InternalBlobValue(val blob: Blob) extends ValueAdapter {
 
   val BOLT_BLOB_TYPE = new TypeRepresentation(TypeConstructor.BLOB);
 
@@ -34,11 +32,15 @@ class InternalBlobValue(val blob: Blob)
   override def toString: String = s"BoltBlobValue(blob=${blob.toString})"
 }
 
-case class BlobChunk(chunkId: Int, offset: Int, length: Int, bytes: Array[Byte], eof: Boolean, totalBytes: Int) {
+case class BlobChunk(
+                      chunkId: Int,
+                      offset: Int,
+                      length: Int, bytes: Array[Byte],
+                      eof: Boolean, totalBytes: Int) {
 }
 
 class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val mimeType: MimeType)
-  extends Blob with Logging {
+  extends Blob {
 
   val FETCH_CHUNK_SIZE = 1024 * 10;
   //10k
@@ -63,7 +65,8 @@ class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val m
   }
 }
 
-class BlobInputStream(firstChunk:BlobChunk, chunkFutures: ArrayBuffer[CompletableFuture[BlobChunk]], error: CompletableFuture[Throwable]) extends InputStream with Logging {
+class BlobInputStream(firstChunk: BlobChunk, chunkFutures: ArrayBuffer[CompletableFuture[BlobChunk]], error: CompletableFuture[Throwable])
+  extends InputStream {
   //maybe blob is validated
   checkErrors();
 

@@ -34,7 +34,7 @@ public class MessageWriterV5 extends AbstractMessageWriter
 {
     public MessageWriterV5(PackOutput output )
     {
-        super( new ValuePackerV2( output ), buildEncoders() );
+        super( new ValuePackerV5( output ), buildEncoders() );
     }
 
     private static Map<Byte,MessageEncoder> buildEncoders()
@@ -47,6 +47,7 @@ public class MessageWriterV5 extends AbstractMessageWriter
         result.put( DiscardMessage.SIGNATURE, new DiscardMessageEncoder() ); // new
         result.put( PullMessage.SIGNATURE, new PullMessageEncoder() ); // new
 
+        //GetBlobMessageEncoder
         result.put(BlobMessageSignature.SIGNATURE_GET_BLOB(), new GetBlobMessageEncoder() ); // new
 
         result.put( BeginMessage.SIGNATURE, new BeginMessageEncoder() );

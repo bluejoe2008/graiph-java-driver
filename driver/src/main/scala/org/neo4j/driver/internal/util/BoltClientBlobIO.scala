@@ -58,11 +58,11 @@ object BoltClientBlobIO {
   def packBlob(blob: Blob, packer: org.neo4j.driver.internal.packstream.PackStream.Packer): Unit = {
     val out = packer._get("out").asInstanceOf[org.neo4j.driver.internal.packstream.PackOutput];
     //create a temp blodid
-    val tempBlobId = BlobIO.blobIdFactory.create();
+    val tempBlobId = BlobId.EMPTY;
     out.writeByte(BlobIO.BOLT_VALUE_TYPE_BLOB_INLINE);
 
     //write blob entry
-    BlobIO._pack(Blob.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
+    BlobIO._pack(BlobFactory.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
 
     //write inline
     val bytes = blob.toBytes();

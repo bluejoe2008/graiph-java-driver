@@ -18,9 +18,9 @@
  */
 package org.neo4j.driver.internal.types;
 
+import org.neo4j.driver.internal.value.InternalBlobValue;
 import org.neo4j.driver.internal.value.InternalValue;
 import org.neo4j.driver.Value;
-import org.neo4j.blob.BlobHolder;
 
 public enum TypeConstructor
 {
@@ -71,7 +71,7 @@ public enum TypeConstructor
     BLOB {
         @Override
         public boolean covers(Value value) {
-            return value instanceof BlobHolder;
+            return value instanceof InternalBlobValue;
         }
     },
 
