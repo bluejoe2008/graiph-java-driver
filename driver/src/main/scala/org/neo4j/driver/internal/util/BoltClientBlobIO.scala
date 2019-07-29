@@ -62,7 +62,7 @@ object BoltClientBlobIO {
     out.writeByte(BlobIO.BOLT_VALUE_TYPE_BLOB_INLINE);
 
     //write blob entry
-    BlobIO._pack(BlobFactory.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
+    BlobIO._pack(Blob.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
 
     //write inline
     val bytes = blob.toBytes();
