@@ -3,11 +3,12 @@ package org.neo4j.driver.internal.util
 import java.util
 
 import org.neo4j.blob._
-import org.neo4j.blob.utils.ReflectUtils._
-import org.neo4j.blob.utils._
+import org.neo4j.blob.impl.{BlobFactory, InlineBlob}
+import org.neo4j.blob.util.ReflectUtils._
+import org.neo4j.blob.util._
 import org.neo4j.driver.Value
 import org.neo4j.driver.internal.spi.Connection
-import org.neo4j.driver.internal.value.{RemoteBlob, InternalBlobValue}
+import org.neo4j.driver.internal.value.{InternalBlobValue, RemoteBlob}
 
 /**
   * Created by bluejoe on 2019/4/18.
@@ -62,7 +63,7 @@ object BoltClientBlobIO {
     out.writeByte(BlobIO.BOLT_VALUE_TYPE_BLOB_INLINE);
 
     //write blob entry
-    BlobIO._pack(Blob.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
+    BlobIO._pack(BlobFactory.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
 
     //write inline
     val bytes = blob.toBytes();
