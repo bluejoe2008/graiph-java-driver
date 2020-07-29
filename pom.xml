@@ -136,6 +136,13 @@
     </dependencies>
   </dependencyManagement>
 
+  <distributionManagement>
+    <repository>
+      <id>sdc</id>
+      <url>http://10.0.82.220:8081/repository/maven</url>
+    </repository>
+  </distributionManagement>
+
   <profiles>
     <!-- If a revision has not been explicitly set, sort it out by looking at git metadata -->
     <profile>
@@ -406,4 +413,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>
