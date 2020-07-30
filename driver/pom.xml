@@ -19,11 +19,12 @@
   <parent>
     <groupId>org.neo4j.driver</groupId>
     <artifactId>neo4j-java-driver-parent</artifactId>
-    <version>2.0.1-graiph</version>
+    <version>2.0.1-graiph-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>neo4j-java-driver</artifactId>
+  <version>2.0.1-graiph-SNAPSHOT</version>
 
   <packaging>jar</packaging>
   <name>Neo4j Java Driver</name>

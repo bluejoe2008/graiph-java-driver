@@ -18,7 +18,7 @@
 
   <groupId>org.neo4j.driver</groupId>
   <artifactId>neo4j-java-driver-parent</artifactId>
-  <version>2.0.1-graiph</version>
+  <version>2.0.1-graiph-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>Neo4j Java Driver Project</name>
@@ -137,9 +137,13 @@
   </dependencyManagement>
 
   <distributionManagement>
+    <snapshotRepository>
+      <id>sdc</id>
+      <url>http://10.0.82.220:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
     <repository>
       <id>sdc</id>
-      <url>http://10.0.82.220:8081/repository/maven</url>
+      <url>http://10.0.82.220:8081/repository/maven-releases</url>
     </repository>
   </distributionManagement>
 
