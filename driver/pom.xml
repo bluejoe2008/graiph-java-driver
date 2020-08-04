@@ -24,7 +24,6 @@
   </parent>
 
   <artifactId>neo4j-java-driver</artifactId>
-  <version>2.0.1-graiph-SNAPSHOT</version>
 
   <packaging>jar</packaging>
   <name>Neo4j Java Driver</name>
@@ -40,7 +39,6 @@
     <dependency>
       <groupId>org.grapheco</groupId>
       <artifactId>graiph-blob-impl</artifactId>
-      <version>0.1.0</version>
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>

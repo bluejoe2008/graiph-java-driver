@@ -52,12 +52,17 @@ class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val m
           new ByteArrayInputStream(Array[Byte]());
         }
         else {
-          val error = new CompletableFuture[Throwable]();
-          val report = new CompletableFuture[(BlobChunk, ArrayBuffer[CompletableFuture[BlobChunk]])]();
-          val handler = new GetBlobMessageHandler(report, error);
-          conn.writeAndFlush(new GetBlobMessage(remoteHandle), handler);
-          val (firstChunk, chunkFutures) = report.get();
-          new BlobInputStream(firstChunk, chunkFutures, error);
+          val error = new CompletableFuture[Throwable]()
+          val report = new CompletableFuture[(BlobChunk, ArrayBuffer[CompletableFuture[BlobChunk]])]()
+          val handler = new GetBlobMessageHandler(report, error)
+          conn.writeAndFlush(new GetBlobMessage(remoteHandle), handler)
+          val reportValue = report.get()
+          if(reportValue == null) {
+            throw new FailedToReadStreamException(error.get)
+          }
+
+          val (firstChunk, chunkFutures) = reportValue;
+          new BlobInputStream(firstChunk, chunkFutures, error)
         }
 
       consume(is);

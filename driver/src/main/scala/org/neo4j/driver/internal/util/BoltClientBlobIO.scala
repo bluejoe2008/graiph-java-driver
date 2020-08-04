@@ -3,7 +3,7 @@ package org.neo4j.driver.internal.util
 import java.util
 
 import org.neo4j.blob._
-import org.neo4j.blob.impl.{BlobFactory, InlineBlob}
+import org.neo4j.blob.impl.{BlobFactory, BlobIdFactory, InlineBlob}
 import org.neo4j.blob.util.ReflectUtils._
 import org.neo4j.blob.util._
 import org.neo4j.driver.Value
@@ -59,7 +59,7 @@ object BoltClientBlobIO {
   def packBlob(blob: Blob, packer: org.neo4j.driver.internal.packstream.PackStream.Packer): Unit = {
     val out = packer._get("out").asInstanceOf[org.neo4j.driver.internal.packstream.PackOutput];
     //create a temp blodid
-    val tempBlobId = BlobId.EMPTY;
+    val tempBlobId = BlobIdFactory.EMPTY;
     out.writeByte(BlobIO.BOLT_VALUE_TYPE_BLOB_INLINE);
 
     //write blob entry
