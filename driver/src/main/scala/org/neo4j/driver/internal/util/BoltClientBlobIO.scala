@@ -11,8 +11,8 @@ import org.neo4j.driver.internal.spi.Connection
 import org.neo4j.driver.internal.value.{InternalBlobValue, RemoteBlob}
 
 /**
-  * Created by bluejoe on 2019/4/18.
-  */
+ * Created by bluejoe on 2019/4/18.
+ */
 object BoltClientBlobIO {
 
   def unpackBlob(unpacker: org.neo4j.driver.internal.packstream.PackStream.Unpacker): Value = {
@@ -66,7 +66,17 @@ object BoltClientBlobIO {
     BlobIO._pack(BlobFactory.makeEntry(tempBlobId, blob)).foreach(out.writeLong(_));
 
     //write inline
-    val bytes = blob.toBytes();
-    out.writeBytes(bytes);
+    val nlen = blob.length
+    blob.offerStream(is => {
+      val bytes = new Array[Byte](10240)
+      var nread = 0
+      while (nread < nlen) {
+        val nbytes = is.read(bytes)
+        if (nbytes != -1) {
+          out.writeBytes(bytes.slice(0, nbytes))
+          nread += nbytes
+        }
+      }
+    })
   }
 }

@@ -12,8 +12,8 @@ import org.neo4j.driver.types.Type
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Created by bluejoe on 2019/5/3.
-  */
+ * Created by bluejoe on 2019/5/3.
+ */
 class InternalBlobValue(val blob: Blob) extends ValueAdapter {
 
   val BOLT_BLOB_TYPE = new TypeRepresentation(TypeConstructor.BLOB);
@@ -35,8 +35,10 @@ class InternalBlobValue(val blob: Blob) extends ValueAdapter {
 case class BlobChunk(
                       chunkId: Int,
                       offset: Int,
-                      length: Int, bytes: Array[Byte],
-                      eof: Boolean, totalBytes: Int) {
+                      length: Int,
+                      bytes: Array[Byte],
+                      isTailChunk: Boolean,
+                      totalBytes: Int) {
 }
 
 class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val mimeType: MimeType)
@@ -57,7 +59,7 @@ class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val m
           val handler = new GetBlobMessageHandler(report, error)
           conn.writeAndFlush(new GetBlobMessage(remoteHandle), handler)
           val reportValue = report.get()
-          if(reportValue == null) {
+          if (reportValue == null) {
             throw new FailedToReadStreamException(error.get)
           }
 
@@ -87,7 +89,7 @@ class BlobInputStream(firstChunk: BlobChunk, chunkFutures: ArrayBuffer[Completab
     //this chunk is consumed
     else {
       //end of file
-      if (currentChunk.eof) {
+      if (currentChunk.isTailChunk) {
         -1;
       }
       else {
