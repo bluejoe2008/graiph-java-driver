@@ -41,8 +41,22 @@ case class BlobChunk(
                       totalBytes: Int) {
 }
 
-class RemoteBlob(conn: Connection, remoteHandle: String, val length: Long, val mimeType: MimeType)
-  extends Blob {
+
+class InlineBlob(bytes: Array[Byte], val id: BlobId, val length: Long, val mimeType: MimeType)
+  extends ManagedBlob {
+
+  override val streamSource: InputStreamSource = new InputStreamSource() {
+    override def offerStream[T](consume: (InputStream) => T): T = {
+      val fis = new ByteArrayInputStream(bytes)
+      val t = consume(fis)
+      fis.close()
+      t
+    }
+  }
+}
+
+class RemoteBlob(conn: Connection, remoteHandle: String, val id: BlobId, val length: Long, val mimeType: MimeType)
+  extends ManagedBlob {
 
   val FETCH_CHUNK_SIZE = 1024 * 10;
   //10k

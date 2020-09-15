@@ -3,12 +3,12 @@ package org.neo4j.driver.internal.util
 import java.util
 
 import org.neo4j.blob._
-import org.neo4j.blob.impl.{BlobFactory, InlineBlob}
+import org.neo4j.blob.impl.{BlobFactory}
 import org.neo4j.blob.util.ReflectUtils._
 import org.neo4j.blob.util._
 import org.neo4j.driver.Value
 import org.neo4j.driver.internal.spi.Connection
-import org.neo4j.driver.internal.value.{InternalBlobValue, RemoteBlob}
+import org.neo4j.driver.internal.value.{InlineBlob, InternalBlobValue, RemoteBlob}
 
 /**
  * Created by bluejoe on 2019/4/18.
@@ -37,7 +37,7 @@ object BoltClientBlobIO {
           .asInstanceOf[AnyRef]
           ._get("connection.delegate").asInstanceOf[Connection];
 
-        new InternalBlobValue(new RemoteBlob(conn, remoteHandle, entry.length, entry.mimeType));
+        new InternalBlobValue(new RemoteBlob(conn, remoteHandle, entry.id, entry.length, entry.mimeType));
 
       case BlobIO.BOLT_VALUE_TYPE_BLOB_INLINE =>
         in.readByte();
@@ -49,7 +49,7 @@ object BoltClientBlobIO {
         val length = entry.length;
         val bs = new Array[Byte](length.toInt);
         in.readBytes(bs, 0, length.toInt);
-        new InternalBlobValue(new InlineBlob(bs, length, entry.mimeType));
+        new InternalBlobValue(new InlineBlob(bs, entry.id, length, entry.mimeType));
 
       case _ => null;
     }
