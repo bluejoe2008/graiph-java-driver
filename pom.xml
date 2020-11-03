@@ -144,11 +144,11 @@
   <distributionManagement>
     <snapshotRepository>
       <id>sdc</id>
-      <url>http://10.0.82.220:8081/repository/maven-snapshots/</url>
+      <url>http://<local-mvn-host>/repository/maven-snapshots/</url>
     </snapshotRepository>
     <repository>
       <id>sdc</id>
-      <url>http://10.0.82.220:8081/repository/maven-releases</url>
+      <url>http://<local-mvn-host>/repository/maven-releases</url>
     </repository>
   </distributionManagement>
 
